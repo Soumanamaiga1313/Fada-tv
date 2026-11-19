@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b2f8f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Fada TV</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Mobile app shell: sticky header, one scrolling column, bottom tab bar. System fonts only, to save mobile data. */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --fg:#1b1d3a; --muted:#5b5f7f; --line:#dfe1ec;
+  --indigo:#2b2f8f; --saffron:#e8a317; --on-saffron:#1b1d3a; --ok:#1f7a4d; --warn:#9a5b00;
+  --display: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10112a; --surface:#1a1c3d; --fg:#eceefa; --muted:#a3a7c8; --line:#2c2f5a;
+  --indigo:#9ea4ff; --saffron:#f2b739; --on-saffron:#10112a; --ok:#5fd39b; --warn:#f2b739; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10112a; --surface:#1a1c3d; --fg:#eceefa; --muted:#a3a7c8; --line:#2c2f5a;
+  --indigo:#9ea4ff; --saffron:#f2b739; --on-saffron:#10112a; --ok:#5fd39b; --warn:#f2b739; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--indigo)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo i{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--saffron);box-shadow:inset -6px -4px 0 var(--indigo)}
+.saver{margin-left:auto;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px}
+.saver b{font-weight:700}
+.saver[aria-pressed="true"]{background:var(--saffron);color:var(--on-saffron);border-color:var(--saffron)}
+main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+main .wrap{display:flex;flex-direction:column;gap:20px;padding-block:18px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:24px} h2{font-size:18px} h3{font-size:15px}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.notice{border:1px solid var(--line);border-left:4px solid var(--saffron);background:var(--surface);border-radius:10px;padding:12px 14px;font-size:14px}
+.search{display:flex;gap:8px;flex-wrap:wrap}
+.search input[type=search]{flex:1 1 200px;min-width:0;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:12px;border:0;background:var(--indigo);color:var(--surface);font-weight:600;text-decoration:none;cursor:pointer}
+.btn.alt{background:transparent;color:var(--indigo);border:1px solid var(--line)}
+.btn.saffron{background:var(--saffron);color:var(--on-saffron)}
+.check{display:flex;align-items:center;gap:8px;font-size:14px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;cursor:pointer;text-align:left;padding:0}
+.card .thumb{aspect-ratio:4/3;max-width:100%;background:linear-gradient(135deg,var(--indigo),var(--saffron));display:flex;align-items:flex-end;padding:8px;color:#fff;font-family:var(--display);font-weight:800;font-size:13px}
+.card .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.card .thumb.has-img{padding:0}
+.card .meta{padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.card .meta h3{overflow-wrap:anywhere}
+.list{display:flex;flex-direction:column;gap:10px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit}
+.row .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row .go{font-weight:700;color:var(--indigo);white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.tag.ok{color:var(--ok)} .tag.warn{color:var(--warn)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:14px;text-decoration:none;color:inherit;cursor:pointer}
+.data-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+.data-table td,.data-table th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+.data-table td:last-child,.data-table th:last-child{text-align:right}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{background:none;border:0;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);cursor:pointer}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-current="page"]{color:var(--indigo);font-weight:700}
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,12,40,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet .panel{background:var(--surface);width:100%;max-width:720px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+.sheet video{width:100%;max-width:100%;border-radius:10px;background:#000}
+.close{margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;width:36px;height:36px;cursor:pointer}
+.spinner{padding:24px;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.sheet .panel{animation:up .2s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+</style>
+</head><body>
+
+<header class="top"><div class="wrap">
+  <div class="logo"><i aria-hidden="true"></i>Fada TV</div>
+  <button class="saver" id="saverBtn" aria-pressed="true" title="Économie de données">Économie <b id="saverState">activée</b></button>
+</div></header>
+
+<main><div class="wrap" id="view"></div></main>
+
+<nav class="tabs" aria-label="Menu"><div class="wrap">
+  <button data-tab="accueil" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
+  <button data-tab="films"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>Films</button>
+  <button data-tab="chaines"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 3l4 4 4-4"/></svg>Chaînes</button>
+  <button data-tab="liste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Ma liste</button>
+</div></nav>
+
+<div class="sheet" id="sheet" hidden><div class="panel" id="sheetPanel" role="dialog" aria-modal="true"></div></div>
+
+<script>
+(function(){
+const IA = 'https://archive.org';
+// Only Internet Archive collections made of public-domain or freely licensed films.
+const COLLS = ['feature_films','animationandcartoons','prelinger','silent_films','classic_tv'];
+
+// Official, free and legal sources. We only link to them: playback happens on their own site.
+const CHANNELS = [
+  {name:'TV5MONDEplus', url:'https://www.tv5mondeplus.com', desc:'Films, séries et documentaires francophones, dont beaucoup de films africains. Gratuit avec inscription.', tag:'Films et séries'},
+  {name:'France 24 en direct', url:'https://www.france24.com/fr/direct', desc:'Chaîne d’information en continu, en français, gratuite.', tag:'Direct'},
+  {name:'Africanews', url:'https://fr.africanews.com', desc:'Actualité africaine en français, vidéos gratuites.', tag:'Info Afrique'},
+  {name:'RFI', url:'https://www.rfi.fr/fr/', desc:'Radio France Internationale. L’audio consomme très peu de données.', tag:'Radio', light:true},
+];
+const YT = [
+  {q:'Télé Sahel direct', label:'Télé Sahel'},
+  {q:'ORTN Niger', label:'ORTN'},
+  {q:'Canal 3 Niger', label:'Canal 3 Niger'},
+  {q:'film africain complet chaîne officielle', label:'Films africains (chaînes officielles)'},
+];
+const CATS = [
+  {label:'Films classiques', coll:'feature_films', q:''},
+  {label:'Dessins animés', coll:'animationandcartoons', q:''},
+  {label:'Films muets', coll:'silent_films', q:''},
+  {label:'Documentaires d’archive', coll:'prelinger', q:''},
+  {label:'Séries TV anciennes', coll:'classic_tv', q:''},
+];
+
+// ---- per-viewer storage (best effort) ----
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('fada:'+k); return v===null? d : JSON.parse(v);}catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('fada:'+k, JSON.stringify(v)); }catch(e){} }
+};
+let saver = store.get('saver', true);
+let list = store.get('list', []);
+let live = null; // true when Internet Archive can be reached from this page
+let tab = 'accueil';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mo = b => { const n = Number(b)/1e6; return n >= 1000 ? (n/1000).toFixed(1).replace('.',',')+' Go' : Math.max(1,Math.round(n))+' Mo'; };
+const iaSearchUrl = q => `${IA}/search?query=${encodeURIComponent(q||'')}&and%5B%5D=mediatype%3A%22movies%22`;
+const ytUrl = q => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+const clean = q => String(q||'').replace(/[():"\\\[\]{}^~*?!]/g,' ').trim().slice(0,80);
+
+function fetchT(url, ms=8000){
+  const c = new AbortController(); const t = setTimeout(()=>c.abort(), ms);
+  return fetch(url,{signal:c.signal}).finally(()=>clearTimeout(t));
+}
+async function iaSearch({q='', coll='', fr=false, rows=24}={}){
+  let s = `mediatype:movies AND collection:(${coll || COLLS.join(' OR ')})`;
+  const cq = clean(q); if(cq) s = `(${cq}) AND ` + s;
+  if(fr) s += ' AND language:(French OR fre OR Français)';
+  const p = new URLSearchParams({q:s, rows, page:1, output:'json'});
+  ['identifier','title','year','downloads'].forEach(f=>p.append('fl[]',f));
+  p.append('sort[]','downloads desc');
+  const r = await fetchT(`${IA}/advancedsearch.php?${p}`);
+  if(!r.ok) throw new Error('http '+r.status);
+  return (await r.json()).response.docs || [];
+}
+async function checkLive(){
+  try{ await iaSearch({rows:1}); live = true; }catch(e){ live = false; }
+  render();
+}
+
+// ---- views ----
+function cardHtml(d){
+  const t = esc(Array.isArray(d.title)? d.title[0] : d.title);
+  const img = saver ? `<div class="thumb">${t.slice(0,40)}</div>`
+                    : `<div class="thumb has-img"><img loading="lazy" alt="" src="${IA}/services/img/${encodeURIComponent(d.identifier)}"></div>`;
+  return `<button class="card" data-open="${esc(d.identifier)}" data-title="${t}">${img}
+    <div class="meta"><h3>${t}</h3><span class="muted small">${d.year? esc(d.year)+' · ' : ''}Domaine public</span></div></button>`;
+}
+function previewNotice(){
+  return `<div class="notice"><b>Version d’aperçu.</b> Ici, les films s’ouvrent sur le site d’Internet Archive. Une fois l’application installée sur son propre site, la recherche et la lecture se feront directement dans Fada TV.</div>`;
+}
+function searchBlock(){
+  if(live === false){
+    return `<form class="search" id="searchForm"><input type="search" id="q" placeholder="Titre, acteur, sujet…" aria-label="Rechercher un film">
+      <a class="btn" id="qLink" target="_blank" rel="noopener" href="${iaSearchUrl('')}">Chercher</a></form>`;
+  }
+  return `<form class="search" id="searchForm"><input type="search" id="q" placeholder="Titre, acteur, sujet…" aria-label="Rechercher un film">
+    <button class="btn" type="submit">Chercher</button>
+    <label class="check"><input type="checkbox" id="fr"> En français seulement</label></form>`;
+}
+function catsBlock(){
+  return `<div class="chips">${CATS.map(c => live === false
+    ? `<a class="chip" target="_blank" rel="noopener" href="${IA}/details/${c.coll}">${esc(c.label)}</a>`
+    : `<button class="chip" data-coll="${c.coll}">${esc(c.label)}</button>`).join('')}</div>`;
+}
+function dataTable(){
+  return `<table class="data-table"><thead><tr><th>Qualité vidéo</th><th>Données pour 1 h</th></tr></thead><tbody>
+    <tr><td>Basse (240p)</td><td>≈ 150 à 250 Mo</td></tr>
+    <tr><td>Moyenne (360p)</td><td>≈ 300 à 450 Mo</td></tr>
+    <tr><td>Haute (720p)</td><td>≈ 900 Mo à 1,5 Go</td></tr>
+    <tr><td>Radio / audio</td><td>≈ 30 à 60 Mo</td></tr></tbody></table>
+    <p class="muted small">Valeurs approximatives. Fada TV choisit toujours la plus petite version quand l’économie de données est activée.</p>`;
+}
+
+function viewAccueil(){
+  return `<section style="display:flex;flex-direction:column;gap:8px"><h1>Films, séries et chaînes, gratuits et légaux</h1>
+    <p class="muted">Seulement des contenus que leurs ayants droit autorisent à regarder gratuitement. Pas de piratage, pas d’abonnement.</p></section>
+    ${live===false? previewNotice() : ''}
+    ${searchBlock()}
+    <section style="display:flex;flex-direction:column;gap:10px"><h2>Catégories</h2>${catsBlock()}</section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="section-head"><h2>Les plus regardés</h2><span class="tag ok">Domaine public</span></div>
+      <div id="home-results">${live===null? '<div class="spinner">Chargement…</div>' : live===false? popularFallback() : '<div class="spinner">Chargement…</div>'}</div></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><h2>Chaînes et sites officiels</h2><div class="list">${CHANNELS.slice(0,2).map(chRow).join('')}</div>
+      <button class="btn alt" data-goto="chaines">Voir toutes les chaînes</button></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><h2>Combien de données ça consomme ?</h2>${dataTable()}</section>`;
+}
+function popularFallback(){
+  return `<div class="list">${CATS.map(c=>`<a class="row" target="_blank" rel="noopener" href="${IA}/details/${c.coll}">
+    <div class="txt"><b>${esc(c.label)}</b><span class="muted small">Collection Internet Archive, triée par popularité</span></div><span class="go">Ouvrir</span></a>`).join('')}</div>`;
+}
+function viewFilms(){
+  return `<h1>Films libres</h1>
+    <p class="muted">Films du domaine public hébergés par Internet Archive, une bibliothèque numérique à but non lucratif.</p>
+    ${live===false? previewNotice() : ''}
+    ${searchBlock()}${catsBlock()}
+    <div id="film-results">${live===false? popularFallback() : '<div class="spinner">Chargement…</div>'}</div>`;
+}
+function chRow(c){
+  return `<a class="row" target="_blank" rel="noopener" href="${c.url}"><div class="txt"><b>${esc(c.name)}</b>
+    <span class="muted small">${esc(c.desc)}</span><span>${c.light? '<span class="tag ok">Peu de données</span> ':''}<span class="tag">${esc(c.tag)}</span></span></div><span class="go">Ouvrir</span></a>`;
+}
+function viewChaines(){
+  return `<h1>Chaînes et sites officiels</h1>
+    <p class="muted">Ces services sont gratuits et légaux. La vidéo se lit sur leur propre site.</p>
+    <div class="list">${CHANNELS.map(chRow).join('')}</div>
+    <h2>Chaînes locales sur YouTube</h2>
+    <p class="muted small">Recherche sur YouTube. Vérifiez que la chaîne est bien la chaîne officielle (badge ✓ ou nom de la télé). Astuce : dans YouTube, choisissez la qualité 144p ou 240p pour économiser vos données.</p>
+    <div class="list">${YT.map(y=>`<a class="row" target="_blank" rel="noopener" href="${ytUrl(y.q)}"><div class="txt"><b>${esc(y.label)}</b><span class="muted small">Rechercher « ${esc(y.q)} »</span></div><span class="go">YouTube</span></a>`).join('')}</div>`;
+}
+function viewListe(){
+  if(!list.length) return `<h1>Ma liste</h1><div class="notice">Votre liste est vide. Ouvrez un film et touchez <b>Ajouter à ma liste</b> pour le retrouver ici, même sans connexion.</div>
+    <button class="btn" data-goto="films">Parcourir les films</button>`;
+  return `<h1>Ma liste</h1><p class="muted small">Enregistrée sur ce téléphone seulement.</p>
+    <div class="list">${list.map(i=>`<div class="row"><div class="txt"><b>${esc(i.title)}</b><span class="muted small">${i.size? esc(i.size)+' · ':''}Domaine public</span></div>
+      ${live===false? `<a class="go" target="_blank" rel="noopener" href="${IA}/details/${encodeURIComponent(i.id)}">Ouvrir</a>` : `<button class="btn alt" data-open="${esc(i.id)}" data-title="${esc(i.title)}">Ouvrir</button>`}
+      <button class="btn alt" data-remove="${esc(i.id)}" aria-label="Retirer ${esc(i.title)}">Retirer</button></div>`).join('')}</div>`;
+}
+
+function render(){
+  const v = $('#view');
+  v.innerHTML = ({accueil:viewAccueil, films:viewFilms, chaines:viewChaines, liste:viewListe})[tab]();
+  document.querySelectorAll('nav.tabs button').forEach(b => b.dataset.tab===tab ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
+  $('#saverBtn').setAttribute('aria-pressed', saver);
+  $('#saverState').textContent = saver ? 'activée' : 'désactivée';
+  if(live===true){
+    if(tab==='accueil') loadInto('#home-results', {rows: saver? 8 : 12});
+    if(tab==='films') loadInto('#film-results', {});
+  }
+}
+async function loadInto(sel, opts){
+  const el = $(sel); if(!el) return;
+  el.innerHTML = '<div class="spinner">Chargement…</div>';
+  try{
+    const docs = await iaSearch(opts);
+    el.innerHTML = docs.length ? `<div class="grid">${docs.map(cardHtml).join('')}</div>`
+      : `<div class="notice">Aucun film trouvé. Essayez un autre mot, ou décochez « En français seulement ».</div>`;
+  }catch(e){
+    el.innerHTML = `<div class="notice">Impossible de joindre Internet Archive. Vérifiez votre connexion puis réessayez.</div>`;
+  }
+}
+
+// ---- film sheet ----
+async function openFilm(id, title){
+  const sheet = $('#sheet'), p = $('#sheetPanel');
+  sheet.hidden = false;
+  p.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><h2>${esc(title)}</h2><button class="close" id="closeSheet" aria-label="Fermer">✕</button></div><div class="spinner">Recherche de la version la plus légère…</div>`;
+  try{
+    const r = await fetchT(`${IA}/metadata/${encodeURIComponent(id)}`); const j = await r.json();
+    const vids = (j.files||[]).filter(f => /\.mp4$/i.test(f.name) && f.size).map(f=>({name:f.name, size:Number(f.size), fmt:f.format||''})).sort((a,b)=>a.size-b.size);
+    const desc = String((j.metadata && j.metadata.description) || '').replace(/<[^>]+>/g,' ').slice(0,280);
+    if(!vids.length) throw new Error('none');
+    const pick = saver ? vids[0] : vids[vids.length-1];
+    const url = f => `${IA}/download/${encodeURIComponent(id)}/${f.name.split('/').map(encodeURIComponent).join('/')}`;
+    const inList = list.some(i=>i.id===id);
+    p.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><h2>${esc(title)}</h2><button class="close" id="closeSheet" aria-label="Fermer">✕</button></div>
+      <div id="player"><button class="btn saffron" id="play">▶ Lire (${mo(pick.size)} au total)</button></div>
+      ${desc? `<p class="muted small">${esc(desc)}${desc.length>=280?'…':''}</p>`:''}
+      <h3>Versions disponibles</h3>
+      <table class="data-table"><tbody>${vids.map((f,i)=>`<tr><td>${i===0?'<span class="tag ok">La plus légère</span> ':''}${esc(f.fmt||'MP4')}</td><td><a target="_blank" rel="noopener" href="${url(f)}">Télécharger · ${mo(f.size)}</a></td></tr>`).join('')}</tbody></table>
+      <p class="muted small">Astuce : téléchargez en Wi-Fi, puis regardez hors ligne dans votre galerie.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn alt" id="addList" ${inList?'disabled':''}>${inList?'Déjà dans ma liste':'Ajouter à ma liste'}</button>
+      <a class="btn alt" target="_blank" rel="noopener" href="${IA}/details/${encodeURIComponent(id)}">Voir sur Internet Archive</a></div>`;
+    $('#play').onclick = () => { $('#player').innerHTML = `<video controls autoplay playsinline preload="metadata" src="${url(pick)}"></video>`; };
+    $('#addList').onclick = e => { list.unshift({id, title, size: mo(vids[0].size)}); store.set('list', list); e.target.textContent='Ajouté à ma liste'; e.target.disabled = true; };
+  }catch(e){
+    p.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><h2>${esc(title)}</h2><button class="close" id="closeSheet" aria-label="Fermer">✕</button></div>
+      <div class="notice">Pas de vidéo lisible ici pour ce titre.</div><a class="btn" target="_blank" rel="noopener" href="${IA}/details/${encodeURIComponent(id)}">Ouvrir sur Internet Archive</a>`;
+  }
+}
+function closeSheet(){ const s=$('#sheet'); s.hidden = true; $('#sheetPanel').innerHTML=''; }
+
+// ---- events ----
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab],[data-goto],[data-open],[data-coll],[data-remove],#closeSheet,#saverBtn');
+  if(e.target.id==='sheet'){ closeSheet(); return; }
+  if(!t) return;
+  if(t.id==='closeSheet') return closeSheet();
+  if(t.id==='saverBtn'){ saver=!saver; store.set('saver',saver); return render(); }
+  if(t.dataset.tab || t.dataset.goto){ tab = t.dataset.tab || t.dataset.goto; window.scrollTo(0,0); return render(); }
+  if(t.dataset.open) return openFilm(t.dataset.open, t.dataset.title);
+  if(t.dataset.remove){ list = list.filter(i=>i.id!==t.dataset.remove); store.set('list',list); return render(); }
+  if(t.dataset.coll){ if(tab!=='films'){ tab='films'; render(); } loadInto('#film-results',{coll:t.dataset.coll}); }
+});
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheet(); });
+document.addEventListener('input', e => { if(e.target.id==='q' && $('#qLink')) $('#qLink').href = iaSearchUrl(e.target.value); });
+document.addEventListener('submit', e => {
+  if(e.target.id!=='searchForm') return; e.preventDefault();
+  if(live===false){ const a=$('#qLink'); if(a) a.click(); return; }
+  const q = $('#q').value, fr = $('#fr') && $('#fr').checked;
+  if(tab!=='films'){ tab='films'; render(); $('#q').value=q; if($('#fr')) $('#fr').checked=fr; }
+  loadInto('#film-results',{q, fr});
+});
+
+render(); checkLive();
+if('serviceWorker' in navigator && location.protocol==='https:'){ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} }
+})();
+</script>
+</body></html>
