@@ -64,12 +64,13 @@ p{margin:0}
 .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
 .tag.ok{color:var(--ok)} .tag.warn{color:var(--warn)}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
+.fav{background:none;border:1px solid var(--line);border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:18px;color:var(--saffron)}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:14px;text-decoration:none;color:inherit;cursor:pointer}
 .data-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
 .data-table td,.data-table th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
 .data-table td:last-child,.data-table th:last-child{text-align:right}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
 nav.tabs button{background:none;border:0;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);cursor:pointer}
 nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-current="page"]{color:var(--indigo);font-weight:700}
@@ -92,7 +93,8 @@ nav.tabs button[aria-current="page"]{color:var(--indigo);font-weight:700}
 <nav class="tabs" aria-label="Menu"><div class="wrap">
   <button data-tab="accueil" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
   <button data-tab="films"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>Films</button>
-  <button data-tab="chaines"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 3l4 4 4-4"/></svg>Chaînes</button>
+  <button data-tab="series"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10M9 16v4M15 16v4"/></svg>Séries</button>
+  <button data-tab="direct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9M4.6 4.6a10.5 10.5 0 0 0 0 14.8M19.4 4.6a10.5 10.5 0 0 1 0 14.8"/></svg>Direct</button>
   <button data-tab="liste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Ma liste</button>
 </div></nav>
 
@@ -105,24 +107,39 @@ const IA = 'https://archive.org';
 const COLLS = ['feature_films','animationandcartoons','prelinger','silent_films','classic_tv'];
 
 // Official, free and legal sources. We only link to them: playback happens on their own site.
-const CHANNELS = [
-  {name:'TV5MONDEplus', url:'https://www.tv5mondeplus.com', desc:'Films, séries et documentaires francophones, dont beaucoup de films africains. Gratuit avec inscription.', tag:'Films et séries'},
-  {name:'France 24 en direct', url:'https://www.france24.com/fr/direct', desc:'Chaîne d’information en continu, en français, gratuite.', tag:'Direct'},
-  {name:'Africanews', url:'https://fr.africanews.com', desc:'Actualité africaine en français, vidéos gratuites.', tag:'Info Afrique'},
-  {name:'RFI', url:'https://www.rfi.fr/fr/', desc:'Radio France Internationale. L’audio consomme très peu de données.', tag:'Radio', light:true},
+// Free and legal sources only: official sites, and YouTube channels run by the producers or broadcasters themselves.
+// "yt" = name searched on YouTube (opens the YouTube app on Android). "url" = official website.
+const FILMS = [
+  {name:'TV5MONDEplus', url:'https://www.tv5mondeplus.com', desc:'Films et séries africains récents, en français, dont la Cinémathèque Afrique. Gratuit avec une inscription.', tags:['Français','Afrique'], top:true},
+  {name:'Omoni Oboli French TV', yt:'Omoni Oboli French TV', desc:'Films Nollywood récents en version française, publiés par la productrice Omoni Oboli.', tags:['Français','Nollywood'], top:true},
+  {name:'Maurice Sam TV', yt:'Maurice Sam TV', desc:'Nouveaux films Nollywood qui sortent directement sur sa chaîne.', tags:['Anglais','Nollywood'], top:true},
+  {name:'Ruth Kadiri 247', yt:'Ruth Kadiri 247', desc:'Drames et films romantiques. Plus de 3 millions d’abonnés.', tags:['Anglais','Nollywood']},
+  {name:'Uchenna Mbunabo TV', yt:'Uchenna Mbunabo TV', desc:'Films Nollywood récents, une des plus grosses chaînes de producteurs.', tags:['Anglais','Nollywood']},
+  {name:'Omoni Oboli TV', yt:'Omoni Oboli TV', desc:'Films originaux en anglais, comme « Love in Every Word ».', tags:['Anglais','Nollywood']},
+  {name:'FAAN TV', yt:'FAAN TV Funke Akindele', desc:'Films, comédies et séries de Funke Akindele.', tags:['Anglais','Nollywood']},
+  {name:'Kap Stream', yt:'Kap Stream Kunle Afolayan', desc:'Films du réalisateur Kunle Afolayan, comme « The CEO ».', tags:['Anglais','Nollywood']},
+  {name:'Sonia Uche TV', yt:'Sonia Uche TV', desc:'Chaîne dédiée aux films Nollywood complets.', tags:['Anglais','Nollywood']},
 ];
-const YT = [
-  {q:'Télé Sahel direct', label:'Télé Sahel'},
-  {q:'ORTN Niger', label:'ORTN'},
-  {q:'Canal 3 Niger', label:'Canal 3 Niger'},
-  {q:'film africain complet chaîne officielle', label:'Films africains (chaînes officielles)'},
+const SERIES = [
+  {name:'MARODI TV', yt:'MARODI TV', desc:'Les séries sénégalaises les plus regardées d’Afrique de l’Ouest (Doomu Baay, Lady Diama…). Épisodes de 45 à 55 min.', tags:['Wolof','Sénégal'], top:true},
+  {name:'AREWA24', yt:'AREWA24', url2:'https://arewa24.com', desc:'Chaîne en haoussa : séries dramatiques (Kwana Casa’in, Zabi Biyu…), cuisine, divertissement.', tags:['Haoussa','Nigeria'], top:true},
+  {name:'TV5MONDEplus séries', url:'https://www.tv5mondeplus.com', desc:'Séries africaines et francophones complètes, en français.', tags:['Français','Afrique']},
+  {name:'Uduak Isong TV', yt:'Uduak Isong TV', desc:'Films et web-séries Nollywood.', tags:['Anglais','Nollywood']},
+  {name:'Bimbo Ademoye TV', yt:'Bimbo Ademoye TV', desc:'Web-séries et sketches comiques.', tags:['Anglais','Comédie']},
 ];
+const DIRECT = [
+  {name:'Télé Sahel', yt:'Télé Sahel direct', desc:'Télévision nationale du Niger. Cherchez la chaîne officielle.', tags:['Niger']},
+  {name:'ORTN', yt:'ORTN Niger', desc:'Office de radiodiffusion et télévision du Niger.', tags:['Niger']},
+  {name:'Canal 3 Niger', yt:'Canal 3 Niger', desc:'Chaîne privée nigérienne, émissions et journaux.', tags:['Niger']},
+  {name:'France 24 en direct', url:'https://www.france24.com/fr/direct', desc:'Information en continu, en français.', tags:['Français','Info']},
+  {name:'Africanews', url:'https://fr.africanews.com', desc:'Actualité africaine en français.', tags:['Français','Afrique']},
+  {name:'RFI', url:'https://www.rfi.fr/fr/', desc:'Radio : consomme très peu de données.', tags:['Radio'], light:true},
+];
+const ALL = [...FILMS, ...SERIES, ...DIRECT];
 const CATS = [
-  {label:'Films classiques', coll:'feature_films', q:''},
-  {label:'Dessins animés', coll:'animationandcartoons', q:''},
-  {label:'Films muets', coll:'silent_films', q:''},
-  {label:'Documentaires d’archive', coll:'prelinger', q:''},
-  {label:'Séries TV anciennes', coll:'classic_tv', q:''},
+  {label:'Films classiques', coll:'feature_films'},
+  {label:'Dessins animés', coll:'animationandcartoons'},
+  {label:'Documentaires d’archive', coll:'prelinger'},
 ];
 
 // ---- per-viewer storage (best effort) ----
@@ -196,59 +213,72 @@ function dataTable(){
     <p class="muted small">Valeurs approximatives. Fada TV choisit toujours la plus petite version quand l’économie de données est activée.</p>`;
 }
 
+function srcUrl(s){ return s.url || ytUrl(s.yt); }
+function srcRow(s){
+  const fav = list.some(i=>i.id===s.name);
+  const where = s.url ? 'Site officiel' : 'YouTube';
+  return `<div class="row"><a class="txt" style="text-decoration:none;color:inherit" target="_blank" rel="noopener" href="${srcUrl(s)}">
+      <b>${esc(s.name)}</b><span class="muted small">${esc(s.desc)}</span>
+      <span class="chips" style="gap:4px">${s.light? '<span class="tag ok">Peu de données</span>':''}${(s.tags||[]).map(t=>`<span class="tag${t==='Français'?' ok':''}">${esc(t)}</span>`).join('')}<span class="tag">${where}</span></span></a>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <a class="go" target="_blank" rel="noopener" href="${srcUrl(s)}">Regarder</a>
+      <button class="fav" data-fav="${esc(s.name)}" aria-pressed="${fav}" aria-label="${fav?'Retirer de':'Ajouter à'} ma liste">${fav?'★':'☆'}</button></div></div>`;
+}
+function ytTip(){
+  return `<p class="notice small">Sur YouTube, touchez ⚙ puis <b>Qualité</b> et choisissez <b>144p</b> ou <b>240p</b> : environ 3 fois moins de données. Dans l’app YouTube, activez aussi <b>Paramètres › Économiseur de données</b>.</p>`;
+}
 function viewAccueil(){
-  return `<section style="display:flex;flex-direction:column;gap:8px"><h1>Films, séries et chaînes, gratuits et légaux</h1>
-    <p class="muted">Seulement des contenus que leurs ayants droit autorisent à regarder gratuitement. Pas de piratage, pas d’abonnement.</p></section>
-    ${live===false? previewNotice() : ''}
-    ${searchBlock()}
-    <section style="display:flex;flex-direction:column;gap:10px"><h2>Catégories</h2>${catsBlock()}</section>
-    <section style="display:flex;flex-direction:column;gap:10px"><div class="section-head"><h2>Les plus regardés</h2><span class="tag ok">Domaine public</span></div>
-      <div id="home-results">${live===null? '<div class="spinner">Chargement…</div>' : live===false? popularFallback() : '<div class="spinner">Chargement…</div>'}</div></section>
-    <section style="display:flex;flex-direction:column;gap:10px"><h2>Chaînes et sites officiels</h2><div class="list">${CHANNELS.slice(0,2).map(chRow).join('')}</div>
-      <button class="btn alt" data-goto="chaines">Voir toutes les chaînes</button></section>
+  const top = ALL.filter(s=>s.top);
+  return `<section style="display:flex;flex-direction:column;gap:8px"><h1>Films et séries africains récents, gratuits et légaux</h1>
+    <p class="muted">Nollywood, séries sénégalaises, films en haoussa et en français, télés du Niger. Uniquement des chaînes officielles qui publient gratuitement leurs propres contenus. Pas de piratage.</p></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="section-head"><h2>À regarder en premier</h2><span class="tag ok">Gratuit</span></div>
+      <div class="list">${top.map(srcRow).join('')}</div></section>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+      <button class="card" data-goto="films"><div class="meta"><h3>Films</h3><span class="muted small">${FILMS.length} chaînes</span></div></button>
+      <button class="card" data-goto="series"><div class="meta"><h3>Séries</h3><span class="muted small">${SERIES.length} chaînes</span></div></button>
+      <button class="card" data-goto="direct"><div class="meta"><h3>Direct</h3><span class="muted small">${DIRECT.length} télés et radios</span></div></button></div>
+    ${ytTip()}
     <section style="display:flex;flex-direction:column;gap:10px"><h2>Combien de données ça consomme ?</h2>${dataTable()}</section>`;
 }
-function popularFallback(){
-  return `<div class="list">${CATS.map(c=>`<a class="row" target="_blank" rel="noopener" href="${IA}/details/${c.coll}">
-    <div class="txt"><b>${esc(c.label)}</b><span class="muted small">Collection Internet Archive, triée par popularité</span></div><span class="go">Ouvrir</span></a>`).join('')}</div>`;
-}
 function viewFilms(){
-  return `<h1>Films libres</h1>
-    <p class="muted">Films du domaine public hébergés par Internet Archive, une bibliothèque numérique à but non lucratif.</p>
-    ${live===false? previewNotice() : ''}
+  return `<h1>Films</h1>
+    <p class="muted">Films récents publiés gratuitement par leurs producteurs.</p>
+    <div class="list">${FILMS.map(srcRow).join('')}</div>
+    ${ytTip()}
+    <section style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><div class="section-head"><h2>Films classiques</h2><span class="tag">Domaine public</span></div>
+    <p class="muted small">Vieux films libres de droits d’Internet Archive${live===false? ', qui s’ouvrent sur leur site.' : ', lisibles ici dans la version la plus légère.'}</p>
     ${searchBlock()}${catsBlock()}
-    <div id="film-results">${live===false? popularFallback() : '<div class="spinner">Chargement…</div>'}</div>`;
+    <div id="film-results">${live===false? '' : '<div class="spinner">Chargement…</div>'}</div></section>`;
 }
-function chRow(c){
-  return `<a class="row" target="_blank" rel="noopener" href="${c.url}"><div class="txt"><b>${esc(c.name)}</b>
-    <span class="muted small">${esc(c.desc)}</span><span>${c.light? '<span class="tag ok">Peu de données</span> ':''}<span class="tag">${esc(c.tag)}</span></span></div><span class="go">Ouvrir</span></a>`;
+function viewSeries(){
+  return `<h1>Séries</h1><p class="muted">Séries africaines complètes, publiées par les chaînes qui les produisent.</p>
+    <div class="list">${SERIES.map(srcRow).join('')}</div>${ytTip()}`;
 }
-function viewChaines(){
-  return `<h1>Chaînes et sites officiels</h1>
-    <p class="muted">Ces services sont gratuits et légaux. La vidéo se lit sur leur propre site.</p>
-    <div class="list">${CHANNELS.map(chRow).join('')}</div>
-    <h2>Chaînes locales sur YouTube</h2>
-    <p class="muted small">Recherche sur YouTube. Vérifiez que la chaîne est bien la chaîne officielle (badge ✓ ou nom de la télé). Astuce : dans YouTube, choisissez la qualité 144p ou 240p pour économiser vos données.</p>
-    <div class="list">${YT.map(y=>`<a class="row" target="_blank" rel="noopener" href="${ytUrl(y.q)}"><div class="txt"><b>${esc(y.label)}</b><span class="muted small">Rechercher « ${esc(y.q)} »</span></div><span class="go">YouTube</span></a>`).join('')}</div>`;
+function viewDirect(){
+  return `<h1>Direct et infos</h1><p class="muted">Télévisions et radios gratuites. Pour les chaînes du Niger, vérifiez que c’est bien la chaîne officielle (nom de la télé, badge ✓).</p>
+    <div class="list">${DIRECT.map(srcRow).join('')}</div>`;
 }
 function viewListe(){
-  if(!list.length) return `<h1>Ma liste</h1><div class="notice">Votre liste est vide. Ouvrez un film et touchez <b>Ajouter à ma liste</b> pour le retrouver ici, même sans connexion.</div>
-    <button class="btn" data-goto="films">Parcourir les films</button>`;
+  if(!list.length) return `<h1>Ma liste</h1><div class="notice">Votre liste est vide. Touchez ☆ à côté d’une chaîne ou d’une série pour la retrouver ici.</div>
+    <button class="btn" data-goto="accueil">Voir les contenus</button>`;
   return `<h1>Ma liste</h1><p class="muted small">Enregistrée sur ce téléphone seulement.</p>
-    <div class="list">${list.map(i=>`<div class="row"><div class="txt"><b>${esc(i.title)}</b><span class="muted small">${i.size? esc(i.size)+' · ':''}Domaine public</span></div>
+    <div class="list">${list.map(i=> i.kind==='source'
+      ? `<div class="row"><div class="txt"><b>${esc(i.title)}</b></div><a class="go" target="_blank" rel="noopener" href="${esc(i.url)}">Regarder</a>
+         <button class="btn alt" data-remove="${esc(i.id)}" aria-label="Retirer ${esc(i.title)}">Retirer</button></div>`
+      : `<div class="row"><div class="txt"><b>${esc(i.title)}</b><span class="muted small">${i.size? esc(i.size)+' · ':''}Domaine public</span></div>
       ${live===false? `<a class="go" target="_blank" rel="noopener" href="${IA}/details/${encodeURIComponent(i.id)}">Ouvrir</a>` : `<button class="btn alt" data-open="${esc(i.id)}" data-title="${esc(i.title)}">Ouvrir</button>`}
       <button class="btn alt" data-remove="${esc(i.id)}" aria-label="Retirer ${esc(i.title)}">Retirer</button></div>`).join('')}</div>`;
 }
 
+
 function render(){
   const v = $('#view');
-  v.innerHTML = ({accueil:viewAccueil, films:viewFilms, chaines:viewChaines, liste:viewListe})[tab]();
+  v.innerHTML = ({accueil:viewAccueil, films:viewFilms, series:viewSeries, direct:viewDirect, liste:viewListe})[tab]();
   document.querySelectorAll('nav.tabs button').forEach(b => b.dataset.tab===tab ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
   $('#saverBtn').setAttribute('aria-pressed', saver);
   $('#saverState').textContent = saver ? 'activée' : 'désactivée';
   if(live===true){
-    if(tab==='accueil') loadInto('#home-results', {rows: saver? 8 : 12});
-    if(tab==='films') loadInto('#film-results', {});
+    if(tab==='films') loadInto('#film-results', {rows: saver? 8 : 12});
   }
 }
 async function loadInto(sel, opts){
@@ -295,15 +325,16 @@ function closeSheet(){ const s=$('#sheet'); s.hidden = true; $('#sheetPanel').in
 
 // ---- events ----
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-tab],[data-goto],[data-open],[data-coll],[data-remove],#closeSheet,#saverBtn');
+  const t = e.target.closest('[data-tab],[data-goto],[data-open],[data-coll],[data-remove],[data-fav],#closeSheet,#saverBtn');
   if(e.target.id==='sheet'){ closeSheet(); return; }
   if(!t) return;
   if(t.id==='closeSheet') return closeSheet();
   if(t.id==='saverBtn'){ saver=!saver; store.set('saver',saver); return render(); }
   if(t.dataset.tab || t.dataset.goto){ tab = t.dataset.tab || t.dataset.goto; window.scrollTo(0,0); return render(); }
+  if(t.dataset.fav){ const src = ALL.find(x=>x.name===t.dataset.fav); if(!src) return; if(list.some(i=>i.id===src.name)) list = list.filter(i=>i.id!==src.name); else list.unshift({id:src.name, title:src.name, url:srcUrl(src), kind:'source'}); store.set('list',list); return render(); }
   if(t.dataset.open) return openFilm(t.dataset.open, t.dataset.title);
   if(t.dataset.remove){ list = list.filter(i=>i.id!==t.dataset.remove); store.set('list',list); return render(); }
-  if(t.dataset.coll){ if(tab!=='films'){ tab='films'; render(); } loadInto('#film-results',{coll:t.dataset.coll}); }
+  if(t.dataset.coll){ if(tab!=='films'){ tab='films'; render(); } loadInto('#film-results',{coll:t.dataset.coll}); const fr=$('#film-results'); if(fr) fr.scrollIntoView({block:'start'}); }
 });
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheet(); });
 document.addEventListener('input', e => { if(e.target.id==='q' && $('#qLink')) $('#qLink').href = iaSearchUrl(e.target.value); });
@@ -311,7 +342,7 @@ document.addEventListener('submit', e => {
   if(e.target.id!=='searchForm') return; e.preventDefault();
   if(live===false){ const a=$('#qLink'); if(a) a.click(); return; }
   const q = $('#q').value, fr = $('#fr') && $('#fr').checked;
-  if(tab!=='films'){ tab='films'; render(); $('#q').value=q; if($('#fr')) $('#fr').checked=fr; }
+  if(tab!=='films'){ tab='films'; render(); }
   loadInto('#film-results',{q, fr});
 });
 
